@@ -58,7 +58,7 @@ begin
         begin
           if ((UpperCase(Parameter.Name) = 'VALUE') or (UpperCase(Parameter.Name) = 'PART NUMBER')) and (UpperCase(Parameter.Text) = 'NC') then
           begin
-            ComponentValues := ComponentValues + Component.Designator.Text + ': '+ Component.Comment.Text + #13#10;
+            ComponentValues := ComponentValues + Component.Designator.Text + ': '+ Component.Comment.Text + ' (Type: ' + Parameter.Text + ')' + #13#10;
 
             if UpperCase(Parameter.Text) = 'NC' then
             begin
