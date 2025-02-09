@@ -1,7 +1,5 @@
-program CountResistors;
-
 uses
-  SysUtils, Dialogs, SchLib, Sch;
+  StrUtils, Dialogs, SchLib, Sch;
 
 procedure ListComponentValues;
 
@@ -25,6 +23,8 @@ var
   X, Y: Double;
   FontManager: ISch_FontManager;
   FontID: TFont;
+  OriginalValue: string;
+  FixedValue: string;
 begin
   Document := SchServer.GetCurrentSchDocument;
   if Document = nil then
@@ -40,7 +40,7 @@ begin
     Exit;
   end;
 
-  ComponentValues := 'Components with Value or Part Number = NC:' + #13#10;
+  ComponentValues := 'Components with specific parameters:' + #13#10;
   Iterator := Document.SchIterator_Create;
   try
     Iterator.AddFilter_ObjectSet(MkSet(eSchComponent));
@@ -56,12 +56,15 @@ begin
         Parameter := ParamIterator.FirstSchObject;
         while Parameter <> nil do
         begin
-          if ((UpperCase(Parameter.Name) = 'VALUE') or (UpperCase(Parameter.Name) = 'PART NUMBER')) and (UpperCase(Parameter.Text) = 'NC') then
+          // Перевірка наявності параметра та його типу
+          if Assigned(Parameter) and (VarType(Parameter.Text) = varOleStr) then
           begin
-            ComponentValues := ComponentValues + Component.Designator.Text + ': '+ Component.Comment.Text + ' (Type: ' + Parameter.Text + ')' + #13#10;
-
-            if UpperCase(Parameter.Text) = 'NC' then
+            // Перевірка для параметрів "VALUE" або "PART NUMBER" зі значенням "NC"
+            if ((UpperCase(Parameter.Name) = 'VALUE') or (UpperCase(Parameter.Name) = 'PART NUMBER')) and (UpperCase(Parameter.Text) = 'NC') then
             begin
+              ComponentValues := ComponentValues + Component.Designator.Text + ': ' + Component.Comment.Text + ' (Type: ' + Parameter.Text + ')' + #13#10;
+
+              // Додавання мітки "NP" для компонентів зі значенням "NC"
               LabelObject := SchServer.SchObjectFactory(eLabel, eCreate_Default);
               if LabelObject <> nil then
               begin
@@ -74,7 +77,28 @@ begin
                 Document.GraphicallyInvalidate;
               end;
             end;
+
+            // Перевірка на наявність десяткової крапки в полі "Value"
+            if (UpperCase(Parameter.Name) = 'VALUE') then
+            begin
+             OriginalValue := Parameter.Text;
+              if Pos('K', OriginalValue) > 0 then
+              begin
+                // Заміна крапки на кому
+                OriginalValue := Parameter.Text;
+                Parameter.Text := ReplaceStr(OriginalValue, 'K', 'k');
+              end;
+              OriginalValue := Parameter.Text;
+              if Pos('.', OriginalValue) > 0 then
+              begin
+                // Заміна крапки на кому
+                OriginalValue := Parameter.Text;
+                Parameter.Text := ReplaceStr(OriginalValue, '.', ',');
+                ComponentValues := ComponentValues + Component.Designator.Text + ': ' + Parameter.Text + ' -> ' + Parameter.Text + ' (Decimal point replaced)' + #13#10;
+              end;
+            end;
           end;
+
           Parameter := ParamIterator.NextSchObject;
         end;
       finally

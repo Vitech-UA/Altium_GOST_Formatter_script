@@ -66,8 +66,16 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
+[Parameter1]
+Name=
+Value=
+
+[Parameter2]
+Name=Autor
+Value=Starovit V.
+
 [Generic_ScriptingSystem]
-StartProcName=NP.pas>
+StartProcName=Altium_GOST_Formatter_script.pas>
 
 [OutputGroup1]
 Name=Netlist Outputs
