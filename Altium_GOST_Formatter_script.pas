@@ -40,7 +40,7 @@ begin
     Exit;
   end;
 
-  ComponentValues := 'Components with specific parameters:' + #13#10;
+  ComponentValues := ' омпоненти €к≥ будуть пом≥чен≥ NP' + #13#10;
   Iterator := Document.SchIterator_Create;
   try
     Iterator.AddFilter_ObjectSet(MkSet(eSchComponent));
@@ -78,23 +78,33 @@ begin
               end;
             end;
 
-            // ѕерев≥рка на на€вн≥сть дес€тковоњ крапки в пол≥ "Value"
+
             if (UpperCase(Parameter.Name) = 'VALUE') then
             begin
-             OriginalValue := Parameter.Text;
-              if Pos('K', OriginalValue) > 0 then
+            OriginalValue := Parameter.Text;
+              if Pos('uF', OriginalValue) > 0 then
               begin
-                // «ам≥на крапки на кому
+                // зам≥на uF на мк‘ в пол≥ "Value"
                 OriginalValue := Parameter.Text;
-                Parameter.Text := ReplaceStr(OriginalValue, 'K', 'k');
+                Parameter.Text := ReplaceStr(OriginalValue, 'uF', 'мк‘');
               end;
-              OriginalValue := Parameter.Text;
+              if Pos('uH', OriginalValue) > 0 then
+              begin
+                // зам≥на uH на мк√н в пол≥ "Value"
+                OriginalValue := Parameter.Text;
+                Parameter.Text := ReplaceStr(OriginalValue, 'uH', 'мк√н');
+              end;
+              if Pos('кќм', OriginalValue) > 0 then
+              begin
+                // зам≥на кќм на к в пол≥ "Value"
+                Parameter.Text := ReplaceStr(OriginalValue, 'кќм', 'к');
+              end;
               if Pos('.', OriginalValue) > 0 then
               begin
-                // «ам≥на крапки на кому
+                // ѕерев≥рка на на€вн≥сть дес€тковоњ крапки в пол≥ "Value"
                 OriginalValue := Parameter.Text;
                 Parameter.Text := ReplaceStr(OriginalValue, '.', ',');
-                ComponentValues := ComponentValues + Component.Designator.Text + ': ' + Parameter.Text + ' -> ' + Parameter.Text + ' (Decimal point replaced)' + #13#10;
+                //ComponentValues := ComponentValues + Component.Designator.Text + ': ' + Parameter.Text + ' -> ' + Parameter.Text + ' (Decimal point replaced)' + #13#10;
               end;
             end;
           end;
